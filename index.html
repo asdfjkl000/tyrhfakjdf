@@ -1,90 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Coin Toss Game</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-    }
-    button {
-        padding: 10px 20px;
-        margin: 10px;
-        font-size: 16px;
-        cursor: pointer;
-    }
-    .game-box {
-        border: 2px solid #ccc;
-        padding: 20px;
-        margin: 20px auto;
-        width: 80%;
-        max-width: 600px;
-        border-radius: 10px;
-    }
-    .message-box {
-        border: 1px solid #ccc;
-        padding: 10px;
-        margin-top: 20px;
-        background-color: #f9f9f9;
-        border-radius: 5px;
-        overflow-y: auto; /* Enable vertical scroll */
-        height: 200px; /* Set fixed height */
-    }
-    .message {
-        border-bottom: 1px solid #ccc;
-        padding-bottom: 5px;
-        margin-bottom: 5px;
-        font-size: 14px;
-        text-align: left;
-    }
-</style>
+    <!-- Meta tags for specifying character encoding and viewport -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Title of the game -->
+    <title>Coin Toss Game</title>
+
+    <!-- CSS styles for styling the game interface -->
+    <style>
+        /* General styling */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        /* Styling for buttons */
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        /* Styling for the game box */
+        .game-box {
+            border: 2px solid #ccc;
+            padding: 20px;
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+        }
+        /* Styling for the message box */
+        .message-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            overflow-y: auto; /* Enable vertical scroll */
+            height: 200px; /* Set fixed height */
+        }
+        /* Styling for individual messages */
+        .message {
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
 <div class="game-box">
+    <!-- Game title -->
     <h1>Coin Toss Game</h1>
+
+    <!-- Health status of player and opponent -->
     <div id="health-status">
         <p>Player Health: <span id="player-health">100</span></p>
         <p>Opponent Health: <span id="opponent-health">100</span></p>
     </div>
+
+    <!-- Message box for displaying game messages -->
     <div class="message-box" id="messages"></div>
+
+    <!-- Dropdown for selecting heads or tails -->
     <div>
-        <button id="toss-head" onclick="tossCoin('head')">Toss Head</button>
-        <button id="toss-tail" onclick="tossCoin('tail')">Toss Tail</button>
+        <label for="coin-choice">Pick a Side:</label>
+        <select id="coin-choice">
+            <option value="head">Heads</option>
+            <option value="tail">Tails</option>
+        </select>
+        <button onclick="tossCoin()">Toss Coin</button>
     </div>
+
+    <!-- Buttons for player actions (attack and defend) -->
     <div>
         <button id="attack-btn" onclick="playerAction('attack')" disabled>Attack</button>
         <button id="defend-btn" onclick="playerAction('defend')" disabled>Defend</button>
     </div>
+
+    <!-- Reset button for restarting the game -->
     <div>
         <button id="reset-btn" onclick="resetGame()" disabled>Reset Game</button>
     </div>
 </div>
 
+<!-- JavaScript code for game logic -->
 <script>
+    // Initial health values for player and opponent
     let playerHealth = 100;
     let opponentHealth = 100;
     let currentPlayerAction;
 
-    function tossCoin(choice) {
+    // Function for coin toss
+    function tossCoin() {
+        const coinChoice = document.getElementById('coin-choice').value;
         const coinResult = Math.random() < 0.5 ? 'head' : 'tail';
-        const tossMessage = `Coin is ${coinResult}. You chose ${choice}!`;
+        const tossMessage = `Coin is ${coinResult}. You chose ${coinChoice}!`;
 
+        // Enable buttons for player actions
         document.getElementById('attack-btn').disabled = false;
         document.getElementById('defend-btn').disabled = false;
 
+        // Display the result of the coin toss
         showMessage(tossMessage);
     }
 
+    // Function for calculating damage
     function calculateDamage() {
         return Math.floor(Math.random() * 5) + 1; 
     }
 
+    // Function for opponent's action (randomized between attack and defend)
     function opponentAction() {
-        return Math.random() < 0.5 ? 'attack' : 'defend'; // Randomize opponent's action
+        return Math.random() < 0.5 ? 'attack' : 'defend';
     }
 
+    // Function for player's action
     function playerAction(action) {
         currentPlayerAction = action;
         if (action === 'attack') {
@@ -96,12 +130,13 @@
         }
     }
 
+    // Function for player's attack action
     function playerAttack() {
-        const damage = calculateDamage();
-        let opponentBlock = Math.random() < 0.5; // Randomize opponent's block
+        let damage = calculateDamage();
+        let opponentBlock = Math.random() < 0.5;
         if (opponentBlock) {
             showMessage("The opponent completely blocked your attack.");
-            damage = 0; // If opponent blocks, damage is zero
+            damage = 0;
         } else {
             opponentHealth -= damage;
             if (opponentHealth < 0) opponentHealth = 0;
@@ -111,42 +146,44 @@
         opponentTurn();
     }
 
+    // Function for player's defend action
     function playerDefend() {
         const action = opponentAction();
         if (action === 'attack') {
-            const opponentDamage = Math.floor(Math.random() * 4); // Randomize opponent's damage between 0 and 3
+            const opponentDamage = Math.floor(Math.random() * 4);
             playerHealth -= opponentDamage;
             if (playerHealth < 0) playerHealth = 0;
             showMessage(`Opponent inflicts ${opponentDamage} damage.`);
         } else if (action === 'defend') {
-            showMessage("Opponent defends too.");
+            showMessage("Opponent defends");
         }
         updateHealthStatus();
     }
 
+    // Function for opponent's turn
     function opponentTurn() {
         if (currentPlayerAction === 'defend') {
             return;
         }
 
-        if (opponentHealth > 0) { // Check if opponent can attack
+        if (opponentHealth > 0) {
             const action = opponentAction();
             if (action === 'attack') {
                 playerDefend();
             } else if (action === 'defend') {
                 showMessage("Opponent defends.");
             }
-       
         }
-
     }
 
+    // Function for updating health status
     function updateHealthStatus() {
         document.getElementById('player-health').textContent = playerHealth;
         document.getElementById('opponent-health').textContent = opponentHealth;
         checkHealth();
     }
 
+    // Function for checking game over conditions
     function checkHealth() {
         if (playerHealth <= 0) {
             showMessage("Opponent wins.");
@@ -157,22 +194,27 @@
         }
     }
 
+    // Function for resetting the game
     function resetGame() {
         playerHealth = 100;
         opponentHealth = 100;
         updateHealthStatus();
         clearMessages();
         document.getElementById('reset-btn').disabled = true;
+        document.getElementById('attack-btn').disabled = true;
+        document.getElementById('defend-btn').disabled = true;
         document.getElementById('toss-head').disabled = false;
         document.getElementById('toss-tail').disabled = false;
     }
 
+    // Function for disabling buttons
     function disableButtons() {
         document.getElementById('attack-btn').disabled = true;
         document.getElementById('defend-btn').disabled = true;
         document.getElementById('reset-btn').disabled = false;
     }
 
+    // Function for displaying messages
     function showMessage(message) {
         const messagesDiv = document.getElementById('messages');
         const p = document.createElement('p');
@@ -187,3 +229,5 @@
 </script>
 </body>
 </html>
+
+
